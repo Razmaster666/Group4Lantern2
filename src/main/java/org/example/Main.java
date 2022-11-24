@@ -29,10 +29,13 @@ public class Main {
 
         KeyStroke keyStroke = null;
 
-        String title = "APPLE GAME";
-        String toStart = "PRESS E TO START";
-        textGraphics.putString(1, 1, title, SGR.BORDERED);
-        textGraphics.putString(1, 5, toStart, SGR.BLINK, SGR.BOLD);
+        String title = "❦ APPLE GAME ❦";
+        String useNumpad = "Use NUMPAD to control";
+        String toStart = "Press E to begin";
+        textGraphics.putString(13, 1, title, SGR.BOLD);
+        textGraphics.putString(10, 3, useNumpad, SGR.BOLD);
+        textGraphics.putString(12, 5, toStart, SGR.BLINK, SGR.BOLD);
+
 
         terminal.flush();
 
@@ -49,9 +52,7 @@ public class Main {
                 break;
             }
         }
-
         // "Static" things
-
         final char apple = '❦';
 //        int x = 10;
 //        int y = 10;
@@ -60,7 +61,7 @@ public class Main {
 
         Random r = new Random();
 //        Random randomchar = new Random();
-        Position applePosition = new Position(r.nextInt(50), r.nextInt(5));
+        Position applePosition = new Position(r.nextInt(35), r.nextInt(13));
         terminal.setCursorPosition(applePosition.col, applePosition.row);
         terminal.putCharacter(apple);
 
@@ -89,13 +90,12 @@ public class Main {
                         if (applePosition.col == playerposition.col && applePosition.row == playerposition.row) {
 //                            terminal.close();
 //                            applePosition = new Position(r.nextInt(35), r.nextInt(12)); // Apple changes position
-                            applePosition = new Position(r.nextInt(35),13);
+                            textGraphics.putString(0, 0, "Score: " + score++, SGR.ITALIC, SGR.CIRCLED);
+                            applePosition = new Position(r.nextInt(35),r.nextInt(13));
                             terminal.setCursorPosition(applePosition.col, applePosition.row);
                             terminal.putCharacter(apple);
-                            textGraphics.putString(10, 10, String.valueOf(score++), SGR.BOLD);
-//                          continueReadingInput = false;
 
-//                            textGraphics.putString(5, 5, String.valueOf(sum), SGR.BOLD);
+//                          continueReadingInput = false;
 
                         }
                         handlePlayer(playerposition, latestKeyStroke, terminal);
@@ -115,7 +115,7 @@ public class Main {
         // Handle player
         String delete = " ";
 
-        String playerhead = "▣";
+        String playerhead;
 
         Position oldPlayerPosition = new Position(playerPosition.col, playerPosition.row);
 
@@ -145,6 +145,10 @@ public class Main {
             case ArrowRight :
                 playerPosition.col++;
                 playerhead = "►";
+                break;
+            default:
+                playerPosition.col++;
+                playerhead = ":(";
                 break;
 
         }
