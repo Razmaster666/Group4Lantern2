@@ -41,7 +41,7 @@ public class Main {
 
         terminal.flush();
 
-        KeyStroke keyStroke = null;
+        KeyStroke keyStroke;
 
         // TITLE SCREEN
 
@@ -97,10 +97,8 @@ public class Main {
 
         // THE GAME STARTS
 
-        boolean continueReadingInput = true;
-        while (continueReadingInput) {
+        while (true) {
             int index = 0;
-            keyStroke = null;
 
             do {
                 index++;
@@ -138,12 +136,9 @@ public class Main {
                     terminal.flush();
                     break;
                 }
-
             } while (keyStroke == null);
             latestKeyStroke = keyStroke;
-
         }
-
     }
 
     public static void handleHeart (Terminal terminal, int lives) throws Exception {
@@ -267,11 +262,7 @@ public class Main {
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 clip.start();
-
-//                clip.loop(Clip.LOOP_CONTINUOUSLY);
-
             }
-
             else {
                 System.out.println("Error:(");
             }
