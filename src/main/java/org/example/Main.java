@@ -49,7 +49,7 @@ public class Main {
         String useNumpad = "Use ARROW KEYS to control";
         String toStart = "Press any button to start!";
         textGraphics.putString(12, 3, title, SGR.BOLD);
-        textGraphics.putString(10, 6, useNumpad, SGR.BOLD);
+        textGraphics.putString(9, 6, useNumpad, SGR.BOLD);
         textGraphics.putString(8, 9, toStart, SGR.BLINK, SGR.BOLD);
 
         terminal.flush();
@@ -70,7 +70,7 @@ public class Main {
 
         playSound(gameStart);
 
-        final char apple = '❦';
+        final char apple = '✩';
 
         String playerStart = "►";
 
@@ -152,19 +152,19 @@ public class Main {
         String heart;
 
         if(lives == 3){
-            heart = "♡♡♡♡";
+            heart = "♥♥♥♥";
         }
         else if(lives == 2){
-            heart = " ♡♡♡";
+            heart = "♡♥♥♥";
         }
         else if(lives == 1){
-            heart = "  ♡♡";
+            heart = "♡♡♥♥";
         }
         else if(lives == 0){
-            heart = "   ♡";
+            heart = "♡♡♡♥";
         }
         else{
-            heart = "    ";
+            heart = "♡♡♡♡";
         }
         terminal.flush();
 
