@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="NewLanterna2" options="--add-exports java.base/jdk.internal.reflect=ALL-UNNAMED" />
+      <module name="NewLanterna2" options="" />
     </option>
   </component>
 </project>

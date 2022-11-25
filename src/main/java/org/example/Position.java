@@ -8,4 +8,20 @@ public class Position {
         this.col = col;
         this.row = row;
     }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "col=" + col +
+                ", row=" + row +
+                '}';
+    }
 }
