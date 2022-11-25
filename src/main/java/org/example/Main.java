@@ -17,7 +17,9 @@ import java.util.Random;
 public class Main {
 
     static int lives = 4;
-
+    final static String death = "death.wav";
+    final static String gameStart = "gameStart.wav";
+    final static String hit = "hit.wav";
 
 
     public static void main(String[] args) throws Exception {
@@ -33,8 +35,6 @@ public class Main {
         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
 
-//        String path = "captainAmerica.wav";
-//        playMusic(path);
 
         terminal.flush();
 
@@ -62,6 +62,10 @@ public class Main {
                 break;
             }
         }
+        playMusic(gameStart);
+
+//        playMusic(path, ":)");
+
         // "Static" things
         final char apple = '❦';
 
@@ -131,6 +135,8 @@ public class Main {
         }
 
 
+
+
     }
 
     private static void scoreBoard(Terminal terminal) throws Exception{
@@ -171,6 +177,9 @@ public class Main {
         textGraphics.putString(35, 0, heart, SGR.BOLD);
 
         terminal.flush();
+        if (lives == -1){
+            playMusic(death);
+        }
     }
 
     private static void handlePlayer (Position playerPosition, KeyStroke keyStroke, Terminal terminal) throws Exception {
@@ -212,25 +221,25 @@ public class Main {
         }
 
         if (playerPosition.col == 38){
-            terminal.bell();
+            playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
         }
         else if(playerPosition.col == 0){
-            terminal.bell();
+          playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
         }
         else if (playerPosition.row == 0){
-            terminal.bell();
+            playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
         }
         else if (playerPosition.row == 14){
-            terminal.bell();
+            playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
@@ -243,7 +252,7 @@ public class Main {
         terminal.flush();
     }
 
-    public static void playMusic(String filepath) throws Exception{
+    public static void playMusic(String filepath){
 
         try{
             File musicPath = new File (filepath);
@@ -252,7 +261,11 @@ public class Main {
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 clip.start();
+
+//                clip.loop(Clip.LOOP_CONTINUOUSLY);
+
             }
+
             else {
                 System.out.println("Error:(");
             }
