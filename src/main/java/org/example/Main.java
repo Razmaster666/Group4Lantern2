@@ -11,9 +11,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import java.util.Random;
 
 public class Main {
-
-
-
+    static int lives = 4;
     public static void main(String[] args) throws Exception {
         // Setup
         TerminalSize terminalSize = new TerminalSize(40, 15);
@@ -29,13 +27,12 @@ public class Main {
 
         KeyStroke keyStroke = null;
 
-        String title = "❦ APPLE GAME ❦";
+        String title = "❦ APPLE GAME ❦©™";
         String useNumpad = "Use NUMPAD to control";
-        String toStart = "Press E to begin";
-        textGraphics.putString(13, 1, title, SGR.BOLD);
-        textGraphics.putString(10, 3, useNumpad, SGR.BOLD);
-        textGraphics.putString(12, 5, toStart, SGR.BLINK, SGR.BOLD);
-
+        String toStart = "Press E to start!";
+        textGraphics.putString(13, 3, title, SGR.BOLD);
+        textGraphics.putString(10, 6, useNumpad, SGR.BOLD);
+        textGraphics.putString(12, 9, toStart, SGR.BLINK, SGR.BOLD);
 
         terminal.flush();
 
@@ -59,46 +56,52 @@ public class Main {
 
         // Lets go
 
+        String playerStart = "►";
+
         Random r = new Random();
 //        Random randomchar = new Random();
         Position applePosition = new Position(r.nextInt(35), r.nextInt(13));
         terminal.setCursorPosition(applePosition.col, applePosition.row);
         terminal.putCharacter(apple);
+        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC, SGR.CIRCLED);
+        Position playerPosition = new Position(10, 10);
+
+        Position enemyPosition = new Position(5, 5);
+
+        textGraphics.putString(10, 10, playerStart, SGR.BOLD);
 
         terminal.flush();
-
-        String playerStart = "►";
-
-        Position playerposition = new Position(10, 10);
-        textGraphics.putString(10, 10, playerStart, SGR.BOLD);
 
         KeyStroke latestKeyStroke = null;
 
         int score = 1;
         int sum = 0;
+
         boolean continueReadingInput = true;
         while (continueReadingInput) {
-
             int index = 0;
             keyStroke = null;
 
             do {
                 index++;
-                if (index % 40 == 0) {
+                if (index % 50 == 0) {
                     if (latestKeyStroke != null) {
 
-                        if (applePosition.col == playerposition.col && applePosition.row == playerposition.row) {
-//                            terminal.close();
-//                            applePosition = new Position(r.nextInt(35), r.nextInt(12)); // Apple changes position
+                        if (applePosition.col == playerPosition.col && applePosition.row == playerPosition.row) {
+//                          terminal.close();
                             textGraphics.putString(0, 0, "Score: " + score++, SGR.ITALIC, SGR.CIRCLED);
-                            applePosition = new Position(r.nextInt(35),r.nextInt(13));
+                            applePosition = new Position(r.nextInt(34),r.nextInt(13));// Apple changes position
+                            terminal.flush();
                             terminal.setCursorPosition(applePosition.col, applePosition.row);
                             terminal.putCharacter(apple);
+                            terminal.flush();
 
+                            lives--;
+                            handleHeart(terminal, lives);
 //                          continueReadingInput = false;
-
                         }
-                        handlePlayer(playerposition, latestKeyStroke, terminal);
+                        handlePlayer(playerPosition, latestKeyStroke, terminal);
+
                     }
                 }
 
@@ -111,6 +114,32 @@ public class Main {
 
         }
     }
+
+    private static void handleHeart (Terminal terminal, int lives) throws Exception {
+        // Handle enemy
+        lives--;
+        String heart = "♡♡♡";
+
+        if(lives == 3){
+            heart = "♡♡♡";
+        }
+        else if(lives == 2){
+            heart = " ♡♡";
+        }
+        else if(lives == 1){
+            heart = "  ♡";
+        }
+        terminal.flush();
+
+        TextGraphics textGraphics = terminal.newTextGraphics();
+        textGraphics.setForegroundColor(TextColor.ANSI.RED);
+        textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
+
+        textGraphics.putString(37, 0, heart, SGR.BOLD);
+
+        terminal.flush();
+    }
+
     private static void handlePlayer (Position playerPosition, KeyStroke keyStroke, Terminal terminal) throws Exception {
         // Handle player
         String delete = " ";
@@ -122,6 +151,8 @@ public class Main {
         TextGraphics textGraphics = terminal.newTextGraphics();
         textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
+
+        terminal.flush();
 
         boolean up = false;
         boolean down = false;
@@ -148,9 +179,25 @@ public class Main {
                 break;
             default:
                 playerPosition.col++;
-                playerhead = ":(";
+                playerhead = "!";
                 break;
 
+        }
+
+        if (playerPosition.col == 38){
+            playerPosition.col = oldPlayerPosition.col;
+            lives--;
+            handleHeart(terminal, lives);
+            terminal.bell();
+        }
+        else if(playerPosition.col == 0){
+            playerPosition.col = oldPlayerPosition.col;
+        }
+        else if (playerPosition.row == 0){
+            playerPosition.row = oldPlayerPosition.row;
+        }
+        else if (playerPosition.row == 14){
+            playerPosition.row = oldPlayerPosition.row;
         }
 
         textGraphics.putString(oldPlayerPosition.col, oldPlayerPosition.row, delete, SGR.BOLD);
