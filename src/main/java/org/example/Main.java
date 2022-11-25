@@ -20,6 +20,7 @@ public class Main {
     final static String death = "death.wav";
     final static String gameStart = "gameStart.wav";
     final static String hit = "hit.wav";
+    final static String appleGet = "appleGet.wav";
 
 
     public static void main(String[] args) throws Exception {
@@ -115,6 +116,7 @@ public class Main {
                             terminal.setCursorPosition(applePosition.col, applePosition.row);
                             terminal.putCharacter(apple);
                             terminal.flush();
+                            playMusic(appleGet);
 //                          continueReadingInput = false;
                         }
                         handlePlayer(playerPosition, latestKeyStroke, terminal);
