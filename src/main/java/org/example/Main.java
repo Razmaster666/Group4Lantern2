@@ -25,10 +25,10 @@ public class Main {
 
     final static String upperBlock = "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒";
     final static String lowerBlock = "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒";
-    final static String leftBlock = "▀";
-    public static void main(String[] args) throws Exception {
-        // Setup
 
+    public static void main(String[] args) throws Exception {
+
+        // SETUP
 
         TerminalSize terminalSize = new TerminalSize(40, 15);
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(terminalSize);
@@ -39,17 +39,18 @@ public class Main {
         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
 
-
         terminal.flush();
 
         KeyStroke keyStroke = null;
 
-        String title = "❦ APPLE GAME ❦©™";
-        String useNumpad = "Use NUMPAD to control";
-        String toStart = "Press E to start!";
-        textGraphics.putString(13, 3, title, SGR.BOLD);
+        // TITLE SCREEN
+
+        String title = " APPLE GAME © ™";
+        String useNumpad = "Use ARROW KEYS to control";
+        String toStart = "Press any button to start!";
+        textGraphics.putString(12, 3, title, SGR.BOLD);
         textGraphics.putString(10, 6, useNumpad, SGR.BOLD);
-        textGraphics.putString(12, 9, toStart, SGR.BLINK, SGR.BOLD);
+        textGraphics.putString(8, 9, toStart, SGR.BLINK, SGR.BOLD);
 
         terminal.flush();
 
@@ -60,45 +61,41 @@ public class Main {
             while (keyStroke == null);
 
             Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
-            if (c == Character.valueOf('e')) {
+            if (c == keyStroke.getCharacter()) {
                 terminal.clearScreen();
                 terminal.flush();
                 break;
             }
         }
-        playMusic(gameStart);
 
-//        playMusic(path, ":)");
+        playSound(gameStart);
 
-        // "Static" things
         final char apple = '❦';
-
-        // Lets go
 
         String playerStart = "►";
 
         Random r = new Random();
-//        Random randomchar = new Random();
+
         Position applePosition = new Position(35, r.nextInt(13));
         terminal.setCursorPosition(applePosition.col, applePosition.row);
         terminal.putCharacter(apple);
-        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC);
+
+        textGraphics.putString(0, 0, "Score: " + 0, SGR.BOLD);
         Position playerPosition = new Position(10, 10);
 
         textGraphics.putString(10, 10, playerStart, SGR.BOLD);
 
         handleHeart(terminal,lives);
 
-        scoreBoard(terminal);
-
-        paintBorders(terminal);                                          // Paint upper block
+        paintBorders(terminal);
 
         terminal.flush();
 
         KeyStroke latestKeyStroke = null;
 
         int score = 1;
-        int sum = 0;
+
+        // THE GAME STARTS
 
         boolean continueReadingInput = true;
         while (continueReadingInput) {
@@ -111,27 +108,33 @@ public class Main {
                     if (latestKeyStroke != null) {
 
                         if (applePosition.col == playerPosition.col && applePosition.row == playerPosition.row) {
-//                          terminal.close();
-                            textGraphics.putString(0, 0, "Score: " + score++, SGR.ITALIC);
-                            applePosition = new Position(r.nextInt(37),r.nextInt(13));// Apple changes position
-                            if(applePosition.col == 0 || applePosition.row == 0){
+                            // If player is at same position as apple, he/she gains points
+                            textGraphics.putString(0, 0, "Score: " + score++, SGR.BOLD);
+                            // Apple changes position if player eats it or if it's in the wall
+                            applePosition = new Position(r.nextInt(37),r.nextInt(13));
+                            if((applePosition.col > 37 || applePosition.col < 3) || (applePosition.row < 3 || applePosition.row > 14)) {
                                 applePosition = new Position(10,10);
                             }
                             terminal.flush();
                             terminal.setCursorPosition(applePosition.col, applePosition.row);
                             terminal.putCharacter(apple);
                             terminal.flush();
-                            playMusic(appleGet);
-//                          continueReadingInput = false;
+                            playSound(appleGet);
+
                         }
                         handlePlayer(playerPosition, latestKeyStroke, terminal);
                     }
                 }
-                Thread.sleep(1); // might throw InterruptedException
+                Thread.sleep(1);
+
                 keyStroke = terminal.pollInput();
+
+                // GAME OVER SCREEN
+
                 if (lives == 0){
-                    String gameOver= "GAME OVER (you are dead)";
-                    textGraphics.putString(8, 5, gameOver, SGR.BOLD);
+                    textGraphics.setForegroundColor(TextColor.ANSI.RED);
+                    String gameOver= "GAME OVER (you are dead) :(";
+                    textGraphics.putString(8, 7, gameOver, SGR.BOLD);
                     terminal.flush();
                     break;
                 }
@@ -141,21 +144,9 @@ public class Main {
 
         }
 
-
-
-
     }
 
-    private static void scoreBoard(Terminal terminal) throws Exception{
-        TextGraphics textGraphics = terminal.newTextGraphics();
-        textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-        textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
-
-        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC);
-
-    }
-
-    private static void handleHeart (Terminal terminal, int lives) throws Exception {
+    public static void handleHeart (Terminal terminal, int lives) throws Exception {
         // Handle enemy
         lives--;
         String heart;
@@ -185,12 +176,12 @@ public class Main {
 
         terminal.flush();
         if (lives == -1){
-            playMusic(death);
+            playSound(death);
         }
     }
 
     private static void handlePlayer (Position playerPosition, KeyStroke keyStroke, Terminal terminal) throws Exception {
-        // Handle player
+
         String delete = " ";
 
         String playerhead;
@@ -227,10 +218,10 @@ public class Main {
 
         }
 
-        if (playerPosition.col == 38){
+        if (playerPosition.col == 39){
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
             textGraphics.setBackgroundColor(TextColor.ANSI.RED);
-            playMusic(hit);
+            playSound(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
@@ -238,7 +229,7 @@ public class Main {
         else if(playerPosition.col == 0){
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
             textGraphics.setBackgroundColor(TextColor.ANSI.RED);
-            playMusic(hit);
+            playSound(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
@@ -246,13 +237,13 @@ public class Main {
         else if (playerPosition.row == 1){
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
             textGraphics.setBackgroundColor(TextColor.ANSI.RED);
-            playMusic(hit);
+            playSound(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
         }
         else if (playerPosition.row == 14){
-            playMusic(hit);
+            playSound(hit);
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
             textGraphics.setBackgroundColor(TextColor.ANSI.RED);
             lives--;
@@ -267,7 +258,7 @@ public class Main {
         terminal.flush();
     }
 
-    public static void playMusic(String filepath){
+    public static void playSound(String filepath){
 
         try{
             File musicPath = new File (filepath);
