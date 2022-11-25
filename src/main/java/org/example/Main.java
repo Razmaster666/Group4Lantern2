@@ -17,12 +17,15 @@ import java.util.Random;
 public class Main {
 
     static int lives = 4;
+
     final static String death = "death.wav";
     final static String gameStart = "gameStart.wav";
     final static String hit = "hit.wav";
     final static String appleGet = "appleGet.wav";
 
-
+    final static String upperBlock = "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒";
+    final static String lowerBlock = "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒";
+    final static String leftBlock = "▀";
     public static void main(String[] args) throws Exception {
         // Setup
 
@@ -87,6 +90,8 @@ public class Main {
         handleHeart(terminal,lives);
 
         scoreBoard(terminal);
+
+        paintBorders(terminal);                                          // Paint upper block
 
         terminal.flush();
 
@@ -223,18 +228,24 @@ public class Main {
         }
 
         if (playerPosition.col == 38){
+            textGraphics.setForegroundColor(TextColor.ANSI.RED);
+            textGraphics.setBackgroundColor(TextColor.ANSI.RED);
             playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
         }
         else if(playerPosition.col == 0){
-          playMusic(hit);
+            textGraphics.setForegroundColor(TextColor.ANSI.RED);
+            textGraphics.setBackgroundColor(TextColor.ANSI.RED);
+            playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
         }
-        else if (playerPosition.row == 0){
+        else if (playerPosition.row == 1){
+            textGraphics.setForegroundColor(TextColor.ANSI.RED);
+            textGraphics.setBackgroundColor(TextColor.ANSI.RED);
             playMusic(hit);
             lives--;
             handleHeart(terminal, lives);
@@ -242,6 +253,8 @@ public class Main {
         }
         else if (playerPosition.row == 14){
             playMusic(hit);
+            textGraphics.setForegroundColor(TextColor.ANSI.RED);
+            textGraphics.setBackgroundColor(TextColor.ANSI.RED);
             lives--;
             handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
@@ -276,6 +289,24 @@ public class Main {
         catch(Exception e){
 
         }
+    }
+
+    public static void paintBorders(Terminal terminal) throws Exception{
+        TextGraphics textGraphics = terminal.newTextGraphics();
+        textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
+        textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
+
+        textGraphics.putString(0, 1, upperBlock, SGR.BOLD);  // Paint upper block
+        textGraphics.putString(0, 14, lowerBlock, SGR.BOLD); // Paint lower block
+        for (int i = 2; i < 14; i++){
+            textGraphics.putString(0, i, "▒", SGR.BOLD);
+        }
+
+        for (int i = 2; i <= 14; ++i) {
+            textGraphics.putString(39, i, "▒", SGR.BOLD);
+        }
+
+
     }
 }
 
