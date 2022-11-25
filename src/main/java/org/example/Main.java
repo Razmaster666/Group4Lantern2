@@ -45,10 +45,10 @@ public class Main {
 
         // TITLE SCREEN
 
-        String title = " APPLE GAME © ™";
+        String title = "SIKTA MOT STJÄRNORNA © ™";
         String useNumpad = "Use ARROW KEYS to control";
         String toStart = "Press any button to start!";
-        textGraphics.putString(12, 3, title, SGR.BOLD);
+        textGraphics.putString(9, 3, title, SGR.BOLD);
         textGraphics.putString(9, 6, useNumpad, SGR.BOLD);
         textGraphics.putString(8, 9, toStart, SGR.BLINK, SGR.BOLD);
 
@@ -70,7 +70,7 @@ public class Main {
 
         playSound(gameStart);
 
-        final char apple = '✩';
+        final char apple = '✨';
 
         String playerStart = "►";
 
