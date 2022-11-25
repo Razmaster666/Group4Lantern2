@@ -8,12 +8,22 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
 import java.util.Random;
 
 public class Main {
+
     static int lives = 4;
+
+
+
     public static void main(String[] args) throws Exception {
         // Setup
+
+
         TerminalSize terminalSize = new TerminalSize(40, 15);
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(terminalSize);
         Terminal terminal = terminalFactory.createTerminal();
@@ -22,6 +32,9 @@ public class Main {
         TextGraphics textGraphics = terminal.newTextGraphics();
         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
+
+//        String path = "captainAmerica.wav";
+//        playMusic(path);
 
         terminal.flush();
 
@@ -51,8 +64,6 @@ public class Main {
         }
         // "Static" things
         final char apple = '❦';
-//        int x = 10;
-//        int y = 10;
 
         // Lets go
 
@@ -60,15 +71,17 @@ public class Main {
 
         Random r = new Random();
 //        Random randomchar = new Random();
-        Position applePosition = new Position(r.nextInt(35), r.nextInt(13));
+        Position applePosition = new Position(35, r.nextInt(13));
         terminal.setCursorPosition(applePosition.col, applePosition.row);
         terminal.putCharacter(apple);
-        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC, SGR.CIRCLED);
+        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC);
         Position playerPosition = new Position(10, 10);
 
-        Position enemyPosition = new Position(5, 5);
-
         textGraphics.putString(10, 10, playerStart, SGR.BOLD);
+
+        handleHeart(terminal,lives);
+
+        scoreBoard(terminal);
 
         terminal.flush();
 
@@ -89,45 +102,65 @@ public class Main {
 
                         if (applePosition.col == playerPosition.col && applePosition.row == playerPosition.row) {
 //                          terminal.close();
-                            textGraphics.putString(0, 0, "Score: " + score++, SGR.ITALIC, SGR.CIRCLED);
-                            applePosition = new Position(r.nextInt(34),r.nextInt(13));// Apple changes position
+                            textGraphics.putString(0, 0, "Score: " + score++, SGR.ITALIC);
+                            applePosition = new Position(r.nextInt(37),r.nextInt(13));// Apple changes position
+                            if(applePosition.col == 0 || applePosition.row == 0){
+                                applePosition = new Position(10,10);
+                            }
                             terminal.flush();
                             terminal.setCursorPosition(applePosition.col, applePosition.row);
                             terminal.putCharacter(apple);
                             terminal.flush();
-
-                            lives--;
-                            handleHeart(terminal, lives);
 //                          continueReadingInput = false;
                         }
                         handlePlayer(playerPosition, latestKeyStroke, terminal);
-
                     }
                 }
-
                 Thread.sleep(1); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
-
+                if (lives == 0){
+                    String gameOver= "GAME OVER (you are dead)";
+                    textGraphics.putString(8, 5, gameOver, SGR.BOLD);
+                    terminal.flush();
+                    break;
+                }
 
             } while (keyStroke == null);
             latestKeyStroke = keyStroke;
 
         }
+
+
+    }
+
+    private static void scoreBoard(Terminal terminal) throws Exception{
+        TextGraphics textGraphics = terminal.newTextGraphics();
+        textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+        textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
+
+        textGraphics.putString(0, 0, "Score: " + 0, SGR.ITALIC);
+
     }
 
     private static void handleHeart (Terminal terminal, int lives) throws Exception {
         // Handle enemy
         lives--;
-        String heart = "♡♡♡";
+        String heart;
 
         if(lives == 3){
-            heart = "♡♡♡";
+            heart = "♡♡♡♡";
         }
         else if(lives == 2){
-            heart = " ♡♡";
+            heart = " ♡♡♡";
         }
         else if(lives == 1){
-            heart = "  ♡";
+            heart = "  ♡♡";
+        }
+        else if(lives == 0){
+            heart = "   ♡";
+        }
+        else{
+            heart = "    ";
         }
         terminal.flush();
 
@@ -135,7 +168,7 @@ public class Main {
         textGraphics.setForegroundColor(TextColor.ANSI.RED);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
 
-        textGraphics.putString(37, 0, heart, SGR.BOLD);
+        textGraphics.putString(35, 0, heart, SGR.BOLD);
 
         terminal.flush();
     }
@@ -154,15 +187,9 @@ public class Main {
 
         terminal.flush();
 
-        boolean up = false;
-        boolean down = false;
-        boolean left = false;
-        boolean right = false;
-
         switch(keyStroke.getKeyType()){
             case ArrowUp :
                 playerPosition.row--;
-                up = true;
                 playerhead = "▲";
                 break;
             case ArrowDown :
@@ -185,18 +212,27 @@ public class Main {
         }
 
         if (playerPosition.col == 38){
-            playerPosition.col = oldPlayerPosition.col;
+            terminal.bell();
             lives--;
             handleHeart(terminal, lives);
-            terminal.bell();
+            playerPosition.col = oldPlayerPosition.col;
         }
         else if(playerPosition.col == 0){
+            terminal.bell();
+            lives--;
+            handleHeart(terminal, lives);
             playerPosition.col = oldPlayerPosition.col;
         }
         else if (playerPosition.row == 0){
+            terminal.bell();
+            lives--;
+            handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
         }
         else if (playerPosition.row == 14){
+            terminal.bell();
+            lives--;
+            handleHeart(terminal, lives);
             playerPosition.row = oldPlayerPosition.row;
         }
 
@@ -205,6 +241,26 @@ public class Main {
         textGraphics.putString(playerPosition.col, playerPosition.row, playerhead, SGR.BOLD);
 
         terminal.flush();
+    }
+
+    public static void playMusic(String filepath) throws Exception{
+
+        try{
+            File musicPath = new File (filepath);
+            if(musicPath.exists()){
+                AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInput);
+                clip.start();
+            }
+            else {
+                System.out.println("Error:(");
+            }
+        }
+
+        catch(Exception e){
+
+        }
     }
 }
 
